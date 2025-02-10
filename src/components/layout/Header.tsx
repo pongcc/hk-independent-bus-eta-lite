@@ -1,22 +1,17 @@
 import { useEffect, useCallback, useContext } from "react";
 import {
-  Avatar,
   Box,
   IconButton,
   Input,
   Toolbar,
   Typography,
-  Button,
   SxProps,
   Theme,
 } from "@mui/material";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Settings as SettingsIcon,
-  SettingsBrightness as SettingsBrightnessIcon,
-  WbSunny as WbSunnyIcon,
-  DarkMode as DarkModeIcon,
   WifiOff as WifiOffIcon,
   Search as SearchIcon,
 } from "@mui/icons-material";
@@ -24,7 +19,6 @@ import { visuallyHidden } from "@mui/utils";
 import AppContext from "../../context/AppContext";
 import { vibrate, checkMobile } from "../../utils";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { useWeatherCode, WeatherIcons } from "../Weather";
 import useOnline from "../../hooks/useOnline";
 import useLanguage from "../../hooks/useTranslation";
 import DbContext from "../../context/DbContext";
@@ -36,27 +30,14 @@ const Header = () => {
     vibrateDuration,
     geoPermission,
     updateGeolocation,
-    changeLanguage,
-    _colorMode,
-    toggleColorMode,
   } = useContext(AppContext);
   const {
     db: { routeList },
   } = useContext(DbContext);
   const { t } = useTranslation();
   const language = useLanguage();
-  let location = useLocation();
   const navigate = useNavigate();
-  const weatherCodes = useWeatherCode();
   const onlineStatus = useOnline();
-
-  const handleLanguageChange = (lang: "zh" | "en") => {
-    vibrate(vibrateDuration);
-    navigate(location.pathname.replace("/" + language, "/" + lang), {
-      replace: true,
-    });
-    changeLanguage(lang);
-  };
 
   const relocateGeolocation = useCallback(() => {
     try {
@@ -146,23 +127,6 @@ const Header = () => {
           navigate(`/${language}/board`, { replace: true });
         }}
       />
-      <Box sx={weatherPanelSx}>
-        {weatherCodes.slice(0, 2).map((code) => (
-          <Avatar
-            onClick={() =>
-              window.open(
-                `https://www.hko.gov.hk/${
-                  language === "zh" ? "tc" : "en"
-                }/detail.htm`
-              )
-            }
-            key={code}
-            variant="square"
-            src={WeatherIcons[code]}
-            sx={weatherImg}
-          />
-        ))}
-      </Box>
       <Box sx={funcPanelSx}>
         {geoPermission === "granted" && (
           <IconButton
@@ -173,28 +137,6 @@ const Header = () => {
             <LocationOnIcon />
           </IconButton>
         )}
-        <Button
-          sx={languageSx}
-          onClick={() => handleLanguageChange(language === "zh" ? "en" : "zh")}
-          id="lang-selector"
-          variant="text"
-          disableElevation
-          disableRipple
-        >
-          {language !== "zh" ? "繁" : "En"}
-        </Button>
-        <IconButton
-          onClick={() => {
-            vibrate(vibrateDuration);
-            toggleColorMode();
-          }}
-        >
-          {_colorMode === "system" && (
-            <SettingsBrightnessIcon fontSize="small" />
-          )}
-          {_colorMode === "light" && <WbSunnyIcon fontSize="small" />}
-          {_colorMode === "dark" && <DarkModeIcon fontSize="small" />}
-        </IconButton>
         <IconButton
           component={Link}
           to={`/${language}/settings`}
@@ -243,29 +185,8 @@ const searchRouteInputSx: SxProps<Theme> = {
   },
 };
 
-const weatherPanelSx: SxProps<Theme> = {
-  display: "flex",
-  alignContent: "center",
-};
-
 const funcPanelSx: SxProps<Theme> = {
   display: "flex",
   alignItems: "center",
   opacity: 0.7,
-};
-
-const languageSx: SxProps<Theme> = {
-  color: (theme) => theme.palette.text.primary,
-  minWidth: "40px",
-  p: 1,
-  borderRadius: 5,
-  fontWeight: 900,
-  textTransform: "none",
-};
-
-const weatherImg: SxProps<Theme> = {
-  background: "white",
-  height: 24,
-  width: 24,
-  m: 1,
 };

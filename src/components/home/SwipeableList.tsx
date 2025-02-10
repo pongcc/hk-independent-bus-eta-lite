@@ -6,7 +6,6 @@ import React, {
 } from "react";
 import SwipeableViews from "react-swipeable-views";
 import type { HomeTabType } from "./HomeTabbar";
-import SearchRangeController from "./SearchRangeController";
 import NearbyRouteList from "./lists/NearbyRouteList";
 import SavedRouteList from "./lists/SavedRouteList";
 import SmartCollectionRouteList from "./lists/SmartCollectionRouteList";
@@ -48,7 +47,6 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
     return (
       <>
         {/* SwipeableViews has overflow attribute child div and this preventing <SearchRangeControl/> fixed on top using `position: sticky` */}
-        {homeTab === "nearby" ? <SearchRangeController /> : null}
         <SwipeableViews
           index={getViewIdx()}
           onChangeIndex={(idx) => {
